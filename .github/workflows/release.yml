@@ -1,0 +1,58 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            archive: tar.gz
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            archive: tar.gz
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }} -p ferrumbot-cli
+      - name: Pack
+        shell: bash
+        run: |
+          mkdir -p dist
+          BIN="target/${{ matrix.target }}/release/ferrum-bot"
+          OUT="ferrum-bot-${{ github.ref_name }}-${{ matrix.target }}"
+          cp "$BIN" "dist/$OUT"
+          tar -C dist -czf "dist/$OUT.tar.gz" "$OUT"
+          shasum -a 256 "dist/$OUT.tar.gz" > "dist/$OUT.tar.gz.sha256"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: dist/*
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Flatten
+        run: |
+          mkdir -p out
+          find dist -type f -maxdepth 3 -print -exec cp {} out/ \;
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*

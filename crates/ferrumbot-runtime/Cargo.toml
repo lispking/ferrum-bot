@@ -1,0 +1,20 @@
+[package]
+name = "ferrumbot-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+futures.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+ferrumbot-agent = { path = "../ferrumbot-agent" }
+ferrumbot-channels = { path = "../ferrumbot-channels" }
+ferrumbot-config = { path = "../ferrumbot-config" }
+ferrumbot-core = { path = "../ferrumbot-core" }
+ferrumbot-cron = { path = "../ferrumbot-cron" }
+ferrumbot-providers = { path = "../ferrumbot-providers" }
+ferrumbot-tools = { path = "../ferrumbot-tools" }

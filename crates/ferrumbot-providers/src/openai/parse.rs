@@ -5,6 +5,8 @@ use serde_json::{Value, json};
 use crate::{LlmResponse, ToolCallRequest};
 
 pub(super) fn parse_chat_response(payload: Value, success: bool) -> LlmResponse {
+    tracing::debug!("parse_chat_response payload: {:?}", payload);
+
     if !success {
         return LlmResponse {
             content: Some(format!("Error calling LLM: {}", payload)),
@@ -21,11 +23,17 @@ pub(super) fn parse_chat_response(payload: Value, success: bool) -> LlmResponse 
         .cloned()
         .unwrap_or_else(|| json!({}));
 
+    tracing::debug!("choice: {:?}", choice);
+
     let message = choice.get("message").cloned().unwrap_or_else(|| json!({}));
+    tracing::debug!("message: {:?}", message);
+
     let content = message
         .get("content")
         .and_then(|v| v.as_str())
         .map(ToString::to_string);
+
+    tracing::debug!("parsed content: {:?}", content);
 
     let mut tool_calls = Vec::new();
     if let Some(items) = message.get("tool_calls").and_then(|v| v.as_array()) {

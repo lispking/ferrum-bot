@@ -86,22 +86,163 @@ Line editor shortcuts:
 - `Ctrl+C` interrupt current input
 - `Ctrl+D` clean exit
 
+## Configuration
+
+### Initial Setup
+
+Copy the example configuration to your home directory:
+
+```bash
+mkdir -p ~/.ferrum-bot
+cp config.example.json ~/.ferrum-bot/config.json
+```
+
+Then edit `~/.ferrum-bot/config.json` with your API keys and preferences.
+
+### Configuration Structure
+
+```json
+{
+  // Agent defaults
+  "agents": {
+    "defaults": {
+      "workspace": "~/.ferrum-bot/workspace",
+      "model": "anthropic/claude-opus-4-5",
+      "max_tokens": 8192,
+      "temperature": 0.7,
+      "max_tool_iterations": 20
+    }
+  },
+
+  // Communication channels
+  "channels": {
+    "whatsapp": { ... },
+    "telegram": { ... },
+    "discord": { ... },
+    "feishu": { ... }
+  },
+
+  // LLM providers
+  "providers": {
+    "anthropic": { "api_key": "sk-ant-api03-..." },
+    "openai": { "api_key": "sk-..." },
+    "openrouter": { "api_key": "sk-or-v1-..." },
+    "deepseek": { "api_key": "sk-..." },
+    "groq": { "api_key": "gsk_..." },
+    "zhipu": { "api_key": "..." },
+    "dashscope": { "api_key": "..." },
+    "vllm": { "api_base": "http://localhost:8000/v1" },
+    "gemini": { "api_key": "..." },
+    "moonshot": { "api_key": "..." },
+    "aihubmix": { "api_key": "..." }
+  },
+
+  // Gateway settings
+  "gateway": {
+    "host": "0.0.0.0",
+    "port": 18790
+  },
+
+  // Tool restrictions
+  "tools": {
+    "web": { ... },
+    "exec": { "timeout": 60 },
+    "restrict_to_workspace": true
+  }
+}
+```
+
+### Provider Configuration
+
+Supported providers and their model aliases:
+
+| Provider | API Key Field | Model Keywords |
+|----------|--------------|-----------------|
+| Anthropic | `providers.anthropic.api_key` | `anthropic`, `claude` |
+| OpenAI | `providers.openai.api_key` | `openai`, `gpt` |
+| OpenRouter | `providers.openrouter.api_key` | `openrouter` |
+| DeepSeek | `providers.deepseek.api_key` | `deepseek` |
+| Groq | `providers.groq.api_key` | `groq` |
+| Zhipu AI | `providers.zhipu.api_key` | `zhipu`, `glm` |
+| DashScope | `providers.dashscope.api_key` | `dashscope`, `qwen` |
+| VLLM | `providers.vllm.api_base` | `vllm` |
+| Gemini | `providers.gemini.api_key` | `gemini` |
+| Moonshot AI | `providers.moonshot.api_key` | `moonshot`, `kimi` |
+| AIHubMix | `providers.aihubmix.api_key` | `aihubmix` |
+
+### Channel Configuration
+
+#### WhatsApp Cloud API
+```json
+"channels": {
+  "whatsapp": {
+    "enabled": true,
+    "cloud_api": {
+      "access_token": "YOUR_WHATSAPP_TOKEN",
+      "phone_number_id": "YOUR_PHONE_NUMBER_ID",
+      "verify_token": "YOUR_VERIFY_TOKEN",
+      "app_secret": "YOUR_APP_SECRET"
+    }
+  }
+}
+```
+
+#### Telegram
+```json
+"channels": {
+  "telegram": {
+    "enabled": true,
+    "token": "YOUR_BOT_TOKEN"
+  }
+}
+```
+
+#### Discord
+```json
+"channels": {
+  "discord": {
+    "enabled": true,
+    "token": "YOUR_BOT_TOKEN",
+    "intents": 37377
+  }
+}
+```
+
+#### Feishu (飞书)
+```json
+"channels": {
+  "feishu": {
+    "enabled": true,
+    "app_id": "YOUR_APP_ID",
+    "app_secret": "YOUR_APP_SECRET",
+    "verification_token": "YOUR_VERIFICATION_TOKEN"
+  }
+}
+```
+
+### Tool Configuration
+
+```json
+"tools": {
+  "restrict_to_workspace": true,
+  "exec": {
+    "timeout": 60
+  },
+  "web": {
+    "search": {
+      "api_key": "",
+      "max_results": 5
+    }
+  }
+}
+```
+
 ## Operational Defaults
 
 - Workspace restriction is enabled by default (`tools.restrict_to_workspace = true`)
 - `exec` tool includes dangerous command guards and workspace checks
 - `web_fetch` blocks non-http(s), localhost, and private/local IP targets
 - Web and search tools use request timeouts to avoid hanging calls
-
-## Configuration Notes
-
-Set provider keys and model in:
-
-`~/.ferrum-bot/config.json`
-
-For WhatsApp Cloud API, configure under:
-
-`channels.whatsapp.cloudApi`
 
 ## Project Direction
 

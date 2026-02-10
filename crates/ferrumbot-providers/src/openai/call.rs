@@ -42,6 +42,12 @@ impl LlmProvider for OpenAiCompatibleProvider {
         }
 
         let url = format!("{}/chat/completions", self.api_base.trim_end_matches('/'));
+        tracing::debug!("Request URL: {}", url);
+        tracing::debug!("Request body: {:?}", body);
+        tracing::debug!(
+            "API key first 10 chars: {}",
+            &self.api_key[..std::cmp::min(10, self.api_key.len())]
+        );
 
         let mut req = self
             .client
@@ -55,6 +61,7 @@ impl LlmProvider for OpenAiCompatibleProvider {
         }
 
         let resp = req.send().await.context("failed to call provider")?;
+        tracing::debug!("Response status: {:?}", resp.status());
         let success = resp.status().is_success();
         let payload: Value = resp
             .json()
